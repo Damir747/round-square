@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  username   String      @unique
+  password   String
+  role       String
+  createdAt  DateTime    @default(now())
+  roundUsers RoundUser[]
+
+  @@map("user") 
+}
+
+model Round {
+  id         Int         @id @default(autoincrement())
+  name       String
+  startAt    DateTime
+  endAt      DateTime
+  taps       Int         @default(0)
+  points     Int         @default(0)
+  createdAt  DateTime    @default(now())
+  roundUsers RoundUser[]
+
+  @@map("round")
+}
+
+model RoundUser {
+  roundId Int
+  userId  Int
+  points  Int @default(0)
+  taps    Int @default(0)
+
+  round Round @relation(fields: [roundId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@id([roundId, userId])
+  @@map("round_user")
+}
